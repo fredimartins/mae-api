@@ -1,9 +1,20 @@
 import { Request, Response } from 'express';
 import Category from '../models/Category.model';
 
-export const findCategories = async (_: Request, res: Response) => {
+export const findCategories = async (req: Request, res: Response) => {
   try {
-    const categories = await Category.findAll();
+    let categories:any;
+
+    if(req.query.name == '' || req.query.name == undefined){
+      categories = await Category.findAll();
+    } else {
+      categories = await Category.findByName(req.query.name as string);
+    }
+    
+    if (categories == undefined || categories.length < 1 )
+    {
+      return res.status(404).send();
+    }
     res.send({
       data: categories,
     });

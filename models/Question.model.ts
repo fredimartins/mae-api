@@ -55,7 +55,6 @@ class Question extends Model {
       question.answer = await question.answers[0];
       question.answers = await shuffleArray(question.answers);
     }
-    console.log(question)
     return question;
   }
 
