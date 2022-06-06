@@ -49,8 +49,8 @@ class Question extends Model {
   @BelongsTo(() => Category, 'categoryId')
   category: Category;
 
-  static async getRandom() {
-    let question = await this.findOne({ order: Sequelize.literal('random()') });
+  static async getRandom(categoryId:string) {
+    let question = await this.findOne({ where: { categoryId: categoryId }, order: Sequelize.literal('random()') });
     if (question) {
       question.answer = await question.answers[0];
       question.answers = await shuffleArray(question.answers);

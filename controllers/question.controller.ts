@@ -1,9 +1,26 @@
 import { Request, Response } from 'express';
 import Question from '../models/Question.model';
 
-export const findQuestions = async (_: Request, res: Response) => {
+export const findQuestions = async (req: Request, res: Response) => {
   try {
-    const questions = await Question.findAll();
+    let questions : any;
+    let categoryId = String(req.query.categoryId);
+    console.log('categoryId', categoryId, req.query.mode )
+    if (req.query.mode == 'random') {
+       if (!categoryId){
+         return res.status(400).send({
+           message: 'categoryId not found'
+         })
+       }
+      questions = await Question.getRandom(categoryId);
+    } else {
+      questions = await Question.findAll({ limit: 10 });
+    }
+    if (!questions) {
+      return res.status(404).send({
+        message: 'Not found',
+      });
+    }    
     res.send({
       data: questions,
     });
@@ -16,14 +33,8 @@ export const findQuestions = async (_: Request, res: Response) => {
 
 export const findQuestionById = async (req: Request, res: Response) => {
   try {
-    let question : any;
-
-    if (req.params.id == 'random'){
-      question = await Question.getRandom();
-    } else {
-      question = await Question.findByPk(req.params.id);
-    }
-    
+    const question = await Question.findByPk(req.params.id);
+  
     if (!question) {
       return res.status(404).send({
         message: 'Not found',
